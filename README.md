@@ -1,0 +1,2 @@
+# universal_sentence_encoder_summarization
+Extractive summarization using Universal Sentence Encoder
