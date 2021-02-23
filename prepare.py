@@ -4,10 +4,17 @@ import pandas as pd
 from glob import glob
 from nltk.tokenize import sent_tokenize
 
+from utils import load_model
+
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--base_dir', default="C:/Users/Administrator/Desktop/Project/Universal_Sentence_Encoder_Summarization")
 args = parser.parse_args()
+
+def check_dir(base_dir):
+    embedding_dir = os.path.join(base_dir, 'data/embedding')
+    if not os.path.isdir(embedding_dir):
+        os.makedirs(embedding_dir)
 
 def get_file_list(base_dir):
     data_dir = os.path.join(base_dir, 'data/BBC News Summary')
@@ -33,9 +40,11 @@ def load_text(file_path):
         text = f.read()
     return text
 
-def analyze(source_file, target_file):
+def analyze(source_file, target_file, model):
     parse = source_file.split('\\')
-    name, category = parse[-1], parse[-2]
+    category = parse[-2]
+    index = parse[-1].split('.')[0]
+    name =  f'{category}_{index}'
     
     source_text = load_text(source_file)
     target_text = load_text(target_file)
@@ -50,25 +59,33 @@ def analyze(source_file, target_file):
     label = [str(int(i)) for i in label]
     label = ''.join(label)
     
+    embedding = model(sentence).numpy()
     sentence = '///'.join(sentence)
-    return {'category':category, 'name':name, 'title':title, 'sentence':sentence, 'label':label}
+    data = {'name':name, 'title':title, 'sentence':sentence, 'label':label} 
+    return data, embedding
 
-def prepare(source_files, target_files):
+def prepare(source_files, target_files, base_dir, model):
     data = []
     for s, t in zip(source_files, target_files):
         try:
-            _data = analyze(s, t)
+            _data, _embedding = analyze(s, t, model)
             data.append(_data)
+            np.save(os.path.join(base_dir, f"data/embedding/{_data['name']}.npy"), _embedding)
         except:
-            print("Error when : " + s)
+            print("Error in : ", s)
     data = pd.DataFrame(data)
     return data
 
 def main(args):
+    check_dir(args.base_dir)
+    model = load_model(args.base_dir)
+    
     all_source_files, all_target_files = get_file_list(args.base_dir)
     train_source_files, train_target_files, test_source_files, test_target_files = split_data(all_source_files, all_target_files)
-    train_data = prepare(train_source_files, train_target_files)
-    test_data = prepare(test_source_files, test_target_files)
+    
+    train_data = prepare(train_source_files, train_target_files, args.base_dir, model)
+    test_data = prepare(test_source_files, test_target_files, args.base_dir, model)
+    
     train_data.to_csv(os.path.join(args.base_dir, 'data/train_data.csv'), index=False)
     test_data.to_csv(os.path.join(args.base_dir, 'data/test_data.csv'), index=False)
 

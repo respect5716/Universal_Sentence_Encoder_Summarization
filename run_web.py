@@ -1,7 +1,6 @@
 import json
 import requests
 import numpy as np
-import tensorflow_hub as hub
 from nltk.tokenize import sent_tokenize
 from flask import Flask, render_template, request
 
