@@ -12,24 +12,26 @@
     <div>
         <form action="/summarize" method="POST">
             <textarea name="document" cols="30" rows="10"></textarea>
-            <input type="submit">
+            <button type="submit">Summarize</button>
         </form>
     </div>
 
     <div>
         <h3>Summary</h3>
-        {% for summary in summaries %}
-            <li>{{summary}}</li>
+        <h4>{{title}}</h4>
+        {% for _summary in summary %}
+            <li>{{_summary}}</li>
         {% endfor %}
     </div>
 
     <div>
-        <h3>Document</h3>
-        {% for result in results %}
-            {% if result.selected == true %}
-                <p style="background-color: yellow;">{{result.sentence}}</p>
+        <h3>Source Document</h3>
+        <h4>{{title}}</h4>
+        {% for _result in result %}
+            {% if _result.selected == true %}
+                <p style="background-color: yellow;">{{_result.sentence}}</p>
             {% else %}
-                <p>{{result.sentence}}</p>
+                <p>{{_result.sentence}}</p>
             {% endif %}
         {% endfor %}
     </div>

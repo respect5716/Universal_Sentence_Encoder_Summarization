@@ -10,6 +10,14 @@ from models import MMR
 app = Flask(__name__)
 mmr = MMR()
 
+def preprocess(document):
+    document = document.split('\n')
+    title = document[0]
+    sentence = []
+    for i in document[1:]:
+        sentence += sent_tokenize(i)
+    return title, sentence
+
 def inference(sentences):
     headers = {'Content-Type':'application/json'}
     address = "http://127.0.0.1:5001/inference"
@@ -26,13 +34,13 @@ def index():
 @app.route('/summarize', methods=['POST'])
 def summarize():
     document = request.form['document']
-    sentences = sent_tokenize(document)
-    embeddings = inference(sentences)
+    title, sentence = preprocess(document)
+    embedding = inference(sentence)
 
-    selects = mmr.summarize(embeddings)
-    results = [{'sentence':sentence, 'selected':select} for sentence, select in zip(sentences, selects)]
-    summaries = [sentences[idx] for idx, i in enumerate(selects) if i]
-    return render_template('summary.html', summaries=summaries, results=results)
+    selected = mmr.summarize(embedding)
+    result = [{'sentence':_sentence, 'selected':_selected} for _sentence, _selected in zip(sentence, selected)]
+    summary = [sentence[idx] for idx, i in enumerate(selected) if i]
+    return render_template('summary.html', title=title, summary=summary, result=result)
 
 
 if __name__ == '__main__':
