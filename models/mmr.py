@@ -33,7 +33,7 @@ class MMR(object):
         while sum(selected) < max_len:
             remains = [idx for idx, i in enumerate(selected) if not i]
             mmr = [self.mmr_score(embeddings[i], query, embeddings[selected], _lambda) for i in remains]
-            best = np.argsort(mmr)[-1]
+            best = remains[np.argsort(mmr)[-1]]
             selected[best] = True
         
         return selected

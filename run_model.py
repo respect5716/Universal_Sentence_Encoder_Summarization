@@ -1,5 +1,6 @@
 import os
 import json
+import tensorflow as tf
 import tensorflow_hub as hub
 from flask import Flask, request
 
@@ -16,7 +17,8 @@ app = Flask(__name__)
 @app.route('/inference', methods=['POST'])
 def inference():
     data = request.json
-    outputs = model(data['sentences']).numpy().tolist()
+    with tf.device('/cpu:0'):
+        outputs = model(data['sentences']).numpy().tolist()
     outputs = json.dumps(outputs)
     return outputs
 

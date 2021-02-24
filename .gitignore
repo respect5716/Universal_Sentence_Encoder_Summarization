@@ -3,3 +3,4 @@ data/BBC News Summary/*
 data/embedding/*
 ntb/*
 __pycache__/*
+*/__pycache__/*

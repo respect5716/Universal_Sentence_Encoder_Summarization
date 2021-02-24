@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from glob import glob
 from nltk.tokenize import sent_tokenize
 
@@ -18,6 +19,7 @@ def check_dir(base_dir):
 
 def get_file_list(base_dir):
     data_dir = os.path.join(base_dir, 'data/BBC News Summary')
+    assert os.path.isdir(data_dir)
     all_source_files = glob(data_dir + "/News Articles/*/*.txt")
     all_target_files = [i.replace("News Articles", "Summaries") for i in all_source_files]
     return all_source_files, all_target_files
@@ -59,7 +61,8 @@ def analyze(source_file, target_file, model):
     label = [str(int(i)) for i in label]
     label = ''.join(label)
     
-    embedding = model(sentence).numpy()
+    with tf.device('/cpu:0'):
+        embedding = model(sentence).numpy()
     sentence = '///'.join(sentence)
     data = {'name':name, 'title':title, 'sentence':sentence, 'label':label} 
     return data, embedding
