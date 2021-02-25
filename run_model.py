@@ -6,29 +6,22 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow_text import SentencepieceTokenizer
 
-from models import load_sentence_encoder, MMR, BiLSTM
+from models import load_model, MMR, BiLSTM
 
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--base_dir', default="C:/Users/Administrator/Desktop/Project/Universal_Sentence_Encoder_Summarization")
+parser.add_argument('--model_name', default='cnn')
 args = parser.parse_args()
 
 app = Flask(__name__)
+model = load_model(args.model_name, args.base_dir)
 
-## Build models
-sentence_encoder = load_sentence_encoder(args.base_dir)
-mmr = MMR(sentence_encoder)
-bilstm = BiLSTM(sentence_encoder)
-bilstm.load_weights(os.path.join(args.base_dir, 'weights/BiLSTM.h5'))
-model_dict = {
-    'mmr': mmr,
-    'bilstm': bilstm
-}
 
 @app.route('/inference', methods=['POST'])
 def inference():
     data = request.json
-    summary, selected = model_dict[data['model']].summarize(data['document'])
+    summary, selected = model.summarize(data['document'])
     result = {'summary':summary, 'selected':selected}
     result = json.dumps(result)
     return result

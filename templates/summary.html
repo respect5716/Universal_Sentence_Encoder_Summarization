@@ -17,15 +17,14 @@
     </div>
 
     <div>
-        <h3>Summary</h3>
-        <h4>{{title}}</h4>
+        <h3>요약</h3>
         {% for _summary in summary %}
             <li>{{_summary}}</li>
         {% endfor %}
     </div>
 
     <div>
-        <h3>Source Document</h3>
+        <h3>원문</h3>
         <h4>{{title}}</h4>
         {% for _result in result %}
             {% if _result.selected == true %}

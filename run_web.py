@@ -12,7 +12,7 @@ def preprocess(document):
 def inference(document):
     headers = {'Content-Type':'application/json'}
     address = "http://127.0.0.1:5001/inference"
-    data = {'model':'bilstm', 'document':document}
+    data = {'document':document}
 
     result = requests.post(address, data=json.dumps(data), headers=headers)
     result = json.loads(result.content)
