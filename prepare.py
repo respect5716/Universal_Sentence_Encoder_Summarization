@@ -5,7 +5,7 @@ import tensorflow as tf
 from glob import glob
 from nltk.tokenize import sent_tokenize
 
-from utils import load_model
+from models import load_sentence_encoder
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -81,7 +81,7 @@ def prepare(source_files, target_files, base_dir, model):
 
 def main(args):
     check_dir(args.base_dir)
-    model = load_model(args.base_dir)
+    model = load_sentence_encoder(args.base_dir)
     
     all_source_files, all_target_files = get_file_list(args.base_dir)
     train_source_files, train_target_files, test_source_files, test_target_files = split_data(all_source_files, all_target_files)

@@ -1,30 +1,22 @@
 import json
 import requests
 import numpy as np
-from nltk.tokenize import sent_tokenize
 from flask import Flask, render_template, request
 
-from models import MMR
-
 app = Flask(__name__)
-mmr = MMR()
 
 def preprocess(document):
     document = document.split('\n')
-    title = document[0]
-    sentence = []
-    for i in document[1:]:
-        sentence += sent_tokenize(i)
-    return title, sentence
+    return document
 
-def inference(sentences):
+def inference(document):
     headers = {'Content-Type':'application/json'}
     address = "http://127.0.0.1:5001/inference"
-    data = {'sentences':sentences}
+    data = {'model':'mmr', 'document':document}
 
     result = requests.post(address, data=json.dumps(data), headers=headers)
-    embeddings = np.array(json.loads(result.content))
-    return embeddings
+    result = json.loads(result.content)
+    return result
 
 @app.route('/')
 def index():
@@ -33,13 +25,11 @@ def index():
 @app.route('/summarize', methods=['POST'])
 def summarize():
     document = request.form['document']
-    title, sentence = preprocess(document)
-    embedding = inference(sentence)
-
-    selected = mmr.summarize(embedding)
-    result = [{'sentence':_sentence, 'selected':_selected} for _sentence, _selected in zip(sentence, selected)]
-    summary = [sentence[idx] for idx, i in enumerate(selected) if i]
-    return render_template('summary.html', title=title, summary=summary, result=result)
+    document = preprocess(document)
+    result = inference(document)
+    summary, selected = result['summary'], result['selected']
+    result = [{'sentence':_sentence, 'selected':_selected} for _sentence, _selected in zip(document, selected)]
+    return render_template('summary.html', summary=summary, result=result)
 
 
 if __name__ == '__main__':

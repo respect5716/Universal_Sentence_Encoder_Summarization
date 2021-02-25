@@ -1,10 +1,12 @@
 import os
 import json
-import tensorflow as tf
-import tensorflow_hub as hub
 from flask import Flask, request
 
-from utils import load_model
+import tensorflow as tf
+import tensorflow_hub as hub
+from tensorflow_text import SentencepieceTokenizer
+
+from models import load_sentence_encoder, MMR
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -13,16 +15,20 @@ args = parser.parse_args()
 
 app = Flask(__name__)
 
+sentence_encoder = load_sentence_encoder(args.base_dir)
+mmr = MMR(sentence_encoder)
+model_dict = {
+    'mmr': mmr
+}
 
 @app.route('/inference', methods=['POST'])
 def inference():
     data = request.json
-    with tf.device('/cpu:0'):
-        outputs = model(data['sentences']).numpy().tolist()
-    outputs = json.dumps(outputs)
-    return outputs
+    summary, selected = model_dict[data['model']].summarize(data['document'])
+    result = {'summary':summary, 'selected':selected}
+    result = json.dumps(result)
+    return result
 
 
 if __name__ == '__main__':
-    model = load_model(args.base_dir)
     app.run(port=5001, debug=True)
