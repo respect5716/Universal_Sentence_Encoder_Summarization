@@ -29,10 +29,11 @@
         <h4>{{title}}</h4>
         {% for _result in result %}
             {% if _result.selected == true %}
-                <p style="background-color: yellow;">{{_result.sentence}}</p>
+                <span style="background-color: yellow;">{{_result.sentence}}</span>
             {% else %}
-                <p>{{_result.sentence}}</p>
+                <span>{{_result.sentence}}</span>
             {% endif %}
+            <br>
         {% endfor %}
     </div>
 </body>

@@ -6,7 +6,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow_text import SentencepieceTokenizer
 
-from models import load_sentence_encoder, MMR
+from models import load_sentence_encoder, MMR, BiLSTM
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -15,10 +15,14 @@ args = parser.parse_args()
 
 app = Flask(__name__)
 
+## Build models
 sentence_encoder = load_sentence_encoder(args.base_dir)
 mmr = MMR(sentence_encoder)
+bilstm = BiLSTM(sentence_encoder)
+bilstm.load_weights(os.path.join(args.base_dir, 'weights/BiLSTM.h5'))
 model_dict = {
-    'mmr': mmr
+    'mmr': mmr,
+    'bilstm': bilstm
 }
 
 @app.route('/inference', methods=['POST'])

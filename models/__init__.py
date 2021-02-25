@@ -1,6 +1,7 @@
 import os
 import tensorflow_hub as hub
 from .mmr import MMR
+from .bilstm import BiLSTM
 
 
 def load_sentence_encoder(base_dir):
