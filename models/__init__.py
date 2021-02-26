@@ -3,6 +3,7 @@ import tensorflow_hub as hub
 from .mmr import MMR
 from .bilstm import BiLSTM
 from .cnn import CNN
+from .transformer import Transformer
 
 
 def load_sentence_encoder(base_dir):
@@ -23,5 +24,8 @@ def load_model(model_name, base_dir):
     elif model_name == 'cnn':
         model = CNN(sentence_encoder)
         model.load_weights(os.path.join(base_dir, 'weights/CNN.h5'))
+    elif model_name == 'transformer':
+        model = Transformer(sentence_encoder)
+        model.load_weights(os.path.join(base_dir, 'weights/Transformer.h5'))
     
     return model
