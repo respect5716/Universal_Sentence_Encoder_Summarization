@@ -11,7 +11,7 @@ from models import load_model, MMR, BiLSTM
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--base_dir', default="C:/Users/Administrator/Desktop/Project/Universal_Sentence_Encoder_Summarization")
-parser.add_argument('--model_name', default='transformer')
+parser.add_argument('--model_name', default='cnn')
 args = parser.parse_args()
 
 app = Flask(__name__)
